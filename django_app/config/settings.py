@@ -9,6 +9,14 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", os.getenv("SECRET_KEY", "change-me")
 DEBUG      = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", os.getenv("ALLOWED_HOSTS", "*")).split(",")
 
+# Hugging Face Proxy Settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.hf.space',
+    'https://*.huggingface.co',
+    'https://ashutosh1975271-youtube-ai-analysis.hf.space'
+]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
