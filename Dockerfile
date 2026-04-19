@@ -22,13 +22,15 @@ RUN pip install --no-cache-dir -r fastapi_services/requirements.txt
 # Create a directory for supervisor logs
 RUN mkdir -p /var/log/supervisor
 
-# Set Hugging Face specific Environment Variables
+# Entrypoint script
+RUN chmod +x /app/start.sh
+
+# Environment Variables
 ENV DJANGO_SETTINGS_MODULE=config.settings
-ENV PYTHONPATH="/app/django_app:/app/youtube_app:/app"
 ENV PORT=7860
 
 # Hugging Face Spaces run on port 7860 by default
 EXPOSE 7860
 
-# Run everything via Supervisor
+# Run everything via start.sh
 CMD ["/app/start.sh"]
