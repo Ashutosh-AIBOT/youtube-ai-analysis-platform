@@ -1,7 +1,0 @@
-FROM python:3.10-slim
-WORKDIR /app
-COPY django_app/requirements.txt .
-RUN pip install -r requirements.txt
-COPY django_app/ .
-RUN python manage.py collectstatic --noinput
-CMD gunicorn config.wsgi:application --bind 0.0.0.0:$PORT

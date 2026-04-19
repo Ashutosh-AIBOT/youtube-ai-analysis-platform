@@ -3,9 +3,9 @@ services:
   - type: web
     name: aitube-main
     env: docker
-    dockerContext: .
-    dockerfilePath: Dockerfile.django
-    plan: free # Change to starter/standard if needed
+    dockerContext: django_app
+    dockerfilePath: Dockerfile
+    plan: free
     healthCheckPath: /login/
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -15,15 +15,15 @@ services:
   - type: web
     name: aitube-youtube
     env: docker
-    dockerContext: .
-    dockerfilePath: Dockerfile.youtube
+    dockerContext: youtube_app
+    dockerfilePath: Dockerfile
     healthCheckPath: /health
 
   # 3. Sentiment Service
   - type: web
     name: aitube-sentiment
     env: docker
-    dockerContext: .
+    dockerContext: fastapi_services
     dockerfilePath: Dockerfile.sentiment
     healthCheckPath: /health
 
@@ -31,7 +31,7 @@ services:
   - type: web
     name: aitube-rag
     env: docker
-    dockerContext: .
+    dockerContext: fastapi_services
     dockerfilePath: Dockerfile.rag
     healthCheckPath: /health
 
