@@ -1,5 +1,5 @@
 langchain==0.1.0
-langchain-core==0.1.10
+langchain-core>=0.1.40,<0.2.0
 langchain-groq==0.1.0
 langchain-google-genai==1.0.1
 uvicorn==0.30.1
