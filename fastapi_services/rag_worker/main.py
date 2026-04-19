@@ -96,7 +96,7 @@ async def ingest(req: IngestReq, _=Depends(verify)):
                        show_progress_bar=False).tolist()
     ids   = [f"{req.user_id}_{req.video_id}_chunk_{i}"
              for i in range(len(req.chunks))]
-    metas = [{"video_id": req.video_id, "video_title": req.video_title,
+    metas = [{"text": req.chunks[i], "video_id": req.video_id, "video_title": req.video_title,
                "user_id": req.user_id, "chunk_no": i, "worker": WORKER_ID}
              for i in range(len(req.chunks))]
 
