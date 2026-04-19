@@ -4,7 +4,7 @@ services:
     name: aitube-main
     env: docker
     dockerContext: django_app
-    dockerfilePath: Dockerfile
+    dockerfilePath: django_app/Dockerfile
     plan: free
     healthCheckPath: /login/
     envVars:
@@ -16,7 +16,7 @@ services:
     name: aitube-youtube
     env: docker
     dockerContext: youtube_app
-    dockerfilePath: Dockerfile
+    dockerfilePath: youtube_app/Dockerfile
     healthCheckPath: /health
 
   # 3. Sentiment Service
@@ -24,7 +24,7 @@ services:
     name: aitube-sentiment
     env: docker
     dockerContext: fastapi_services
-    dockerfilePath: Dockerfile.sentiment
+    dockerfilePath: fastapi_services/Dockerfile.sentiment
     healthCheckPath: /health
 
   # 4. RAG Worker Service
@@ -32,7 +32,7 @@ services:
     name: aitube-rag
     env: docker
     dockerContext: fastapi_services
-    dockerfilePath: Dockerfile.rag
+    dockerfilePath: fastapi_services/Dockerfile.rag
     healthCheckPath: /health
 
 databases:
