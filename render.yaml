@@ -3,6 +3,8 @@ services:
   - type: web
     name: aitube-main
     env: docker
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /login/
     startCommand: sh -c "cd django_app && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
@@ -14,6 +16,8 @@ services:
   - type: web
     name: aitube-youtube
     env: docker
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     startCommand: uvicorn youtube_app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
 
@@ -21,6 +25,8 @@ services:
   - type: web
     name: aitube-sentiment
     env: docker
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     startCommand: uvicorn fastapi_services.sentiment.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
 
@@ -28,6 +34,8 @@ services:
   - type: web
     name: aitube-rag
     env: docker
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     startCommand: uvicorn fastapi_services.rag_worker.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
 
