@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Login — AITube</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0c0c10;--card:#13131a;--border:#22222e;--border2:#2e2e40;--pu:#7c5cfc;--pud:#5b3dd4;--tx:#f0f0f5;--mu:#6b6b82}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.wrap{width:100%;max-width:400px;padding:20px}
+.logo{text-align:center;margin-bottom:32px}
+.logo-text{font-size:24px;font-weight:600;letter-spacing:-.5px}
+.logo-text span{color:var(--pu)}
+.logo-sub{font-size:13px;color:var(--mu);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px}
+.card-title{font-size:18px;font-weight:500;margin-bottom:6px}
+.card-sub{font-size:13px;color:var(--mu);margin-bottom:24px}
+.form-group{margin-bottom:16px}
+label{font-size:12px;color:var(--mu);display:block;margin-bottom:5px;font-weight:500;letter-spacing:.3px}
+input{background:#1a1a24;border:1px solid var(--border2);color:var(--tx);border-radius:8px;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;padding:11px 14px;width:100%}
+input:focus{border-color:var(--pu)}
+.btn{width:100%;padding:11px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;transition:all .15s;margin-top:4px}
+.btn-primary{background:var(--pu);color:#fff}.btn-primary:hover{background:var(--pud)}
+.footer{text-align:center;margin-top:20px;font-size:13px;color:var(--mu)}
+.footer a{color:#a48bff}
+.alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.2);color:#ff4d6a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-text">&#127916; <span>AI</span>Tube</div>
+    <div class="logo-sub">YouTube Intelligence Platform</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Welcome back</div>
+    <div class="card-sub">Sign in to your account</div>
+    {% if messages %}{% for msg in messages %}<div class="alert">{{ msg }}</div>{% endfor %}{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>EMAIL</label>
+        <input type="email" name="email" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label>PASSWORD</label>
+        <input type="password" name="password" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-primary">Sign in</button>
+    </form>
+  </div>
+  <div class="footer">Don't have an account? <a href="{% url 'register' %}">Create one</a></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+
+  # ── YouTube App ──────────────────────────────────────
+  youtube-app:
+    build:
+      context: ./youtube_app
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8005"
+    env_file: .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Sentiment Service ────────────────────────────────
+  sentiment:
+    build:
+      context: ./fastapi_services
+      dockerfile: Dockerfile.sentiment
+    ports:
+      - "8010:8010"
+    env_file: .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── RAG Worker ───────────────────────────────────────
+  rag-worker:
+    build:
+      context: ./fastapi_services
+      dockerfile: Dockerfile.rag
+    ports:
+      - "8011:8011"
+    env_file: .env
+    environment:
+      - WORKER_ID=worker-1
+      - CHROMA_PATH=/app/chromadb
+    volumes:
+      - chromadb_data:/app/chromadb
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Django App ───────────────────────────────────────
+  django:
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      - YOUTUBE_SERVICE_URL=http://youtube-app:8005
+      - SENTIMENT_SERVICE_URL=http://sentiment:8010
+      - RAG_WORKER_URL=http://rag-worker:8011
+    depends_on:
+      youtube-app:
+        condition: service_healthy
+      sentiment:
+        condition: service_healthy
+      rag-worker:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  chromadb_data:

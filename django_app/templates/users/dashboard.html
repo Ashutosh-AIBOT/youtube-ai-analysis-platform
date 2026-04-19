@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — AITube{% endblock %}
+{% block extra_css %}
+<style>
+.hero{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:rgba(124,92,252,.08);border-radius:50%}
+.hero-title{font-size:22px;font-weight:600;letter-spacing:-.5px;margin-bottom:6px}
+.hero-sub{font-size:14px;color:var(--mu);margin-bottom:20px}
+.add-form{display:flex;gap:10px;max-width:600px}
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.pl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .2s;cursor:pointer;text-decoration:none;display:block;color:inherit}
+.pl-card:hover{border-color:var(--pu);color:inherit}
+.pl-icon{width:40px;height:40px;background:rgba(124,92,252,.15);border-radius:10px;display:grid;place-items:center;font-size:20px;margin-bottom:12px}
+.pl-title{font-size:14px;font-weight:500;margin-bottom:4px;line-height:1.4}
+.pl-meta{font-size:12px;color:var(--mu)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--mu)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hero">
+    <div class="hero-title">Welcome back, {{ user.name|default:user.email }} &#128075;</div>
+    <div class="hero-sub">Paste a YouTube playlist URL to start analysing with AI</div>
+    <div class="add-form">
+      <input id="playlist-url" placeholder="https://youtube.com/playlist?list=..." style="flex:1"/>
+      <button onclick="addPlaylist()" class="btn btn-primary" id="add-btn">
+        &#43; Add Playlist
+      </button>
+    </div>
+    <div id="add-msg" style="font-size:13px;margin-top:10px;display:none"></div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:15px;font-weight:500">Recent Playlists</div>
+    <a href="{% url 'youtube_home' %}" style="font-size:13px;color:var(--mu)">View all &#8594;</a>
+  </div>
+
+  <div class="recent-grid">
+    {% for pl in playlists %}
+    <a href="{% url 'playlist_detail' pl.pk %}" class="pl-card">
+      <div class="pl-icon">&#127916;</div>
+      <div class="pl-title">{{ pl.title|default:"Playlist" }}</div>
+      <div class="pl-meta">{{ pl.video_count }} videos &middot; {{ pl.created_at|date:"M d" }}</div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">&#127916;</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:6px">No playlists yet</div>
+      <div style="font-size:13px">Paste a YouTube playlist URL above to get started</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+async function addPlaylist() {
+  const url = document.getElementById('playlist-url').value.trim()
+  const btn = document.getElementById('add-btn')
+  const msg = document.getElementById('add-msg')
+  if (!url) { showMsg('Please enter a playlist URL', 'error'); return }
+  btn.textContent = '⏳ Loading...'; btn.disabled = true
+  msg.style.display = 'block'; msg.style.color = 'var(--mu)'; msg.textContent = 'Fetching playlist...'
+  try {
+    const r = await fetch('/youtube/add/', {
+      method: 'POST',
+      headers: {'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `url=${encodeURIComponent(url)}`
+    })
+    const d = await r.json()
+    if (d.ok) {
+      showMsg(`✓ Added ${d.video_count} videos!`, 'success')
+      setTimeout(() => location.href = `/youtube/playlist/${d.playlist_id}/`, 1200)
+    } else {
+      showMsg('Error: ' + (d.error || 'Failed'), 'error')
+      btn.textContent = '+ Add Playlist'; btn.disabled = false
+    }
+  } catch(e) {
+    showMsg('Network error: ' + e.message, 'error')
+    btn.textContent = '+ Add Playlist'; btn.disabled = false
+  }
+}
+
+function showMsg(text, type) {
+  const msg = document.getElementById('add-msg')
+  msg.style.display = 'block'
+  msg.style.color = type === 'success' ? 'var(--gr)' : 'var(--re)'
+  msg.textContent = text
+}
+
+function getCookie(name) {
+  let v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')
+  return v ? v.pop() : ''
+}
+
+document.getElementById('playlist-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addPlaylist()
+})
+</script>
+{% endblock %}

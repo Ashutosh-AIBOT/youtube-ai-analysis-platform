@@ -1,0 +1,54 @@
+.
+├── django_app
+│   ├── config
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── templates
+│   │   ├── users
+│   │   │   ├── dashboard.html
+│   │   │   ├── login.html
+│   │   │   └── register.html
+│   │   ├── youtube
+│   │   │   ├── playlist_detail.html
+│   │   │   ├── playlist_list.html
+│   │   │   └── video_detail.html
+│   │   └── base.html
+│   ├── users
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── youtube
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── services.py
+│   │   ├── urls.py
+│   │   └── views.py
+│   ├── Dockerfile
+│   ├── manage.py
+│   └── requirements.txt
+├── fastapi_services
+│   ├── rag_worker
+│   │   └── main.py
+│   ├── sentiment
+│   │   └── main.py
+│   ├── Dockerfile.rag
+│   ├── Dockerfile.sentiment
+│   ├── key_manager.py
+│   └── requirements.txt
+├── youtube_app
+│   ├── analyzer.py
+│   ├── config.py
+│   ├── Dockerfile
+│   ├── main.py
+│   └── requirements.txt
+├── docker-compose.yml
+├── dockerfile
+├── PROJECT_STRUCTURE.txt
+├── README.md
+└── run.sh
+
+11 directories, 40 files

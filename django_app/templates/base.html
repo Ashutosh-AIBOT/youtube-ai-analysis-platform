@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{% block title %}AI Platform{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c10;--card:#13131a;--card2:#1a1a24;--border:#22222e;--border2:#2e2e40;
+  --pu:#7c5cfc;--pud:#5b3dd4;--pul:#a48bff;
+  --cy:#00c9b1;--gr:#22c55e;--re:#ff4d6a;--am:#f59e0b;
+  --tx:#f0f0f5;--mu:#6b6b82;--mu2:#3a3a4a;
+}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
+.mono{font-family:'JetBrains Mono',monospace}
+a{color:var(--pul);text-decoration:none}
+a:hover{color:var(--cy)}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* nav */
+nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:16px;font-weight:600;color:var(--tx);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--pu)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-link{padding:7px 14px;border-radius:8px;font-size:13px;color:var(--mu);transition:all .15s}
+.nav-link:hover{background:var(--card2);color:var(--tx)}
+.nav-link.active{background:rgba(124,92,252,.15);color:var(--pul)}
+.nav-user{font-size:12px;color:var(--mu);margin-left:8px;padding:6px 12px;background:var(--card2);border:1px solid var(--border);border-radius:8px}
+
+/* container */
+.container{max-width:1100px;margin:0 auto;padding:28px 20px}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-.5px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--mu);margin-bottom:24px}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px}
+.card-body{padding:20px}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-title{font-size:14px;font-weight:500}
+
+/* forms */
+input,textarea,select{background:var(--card2);border:1px solid var(--border2);color:var(--tx);border-radius:8px;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;padding:10px 14px;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--pu)}
+label{font-size:12px;color:var(--mu);display:block;margin-bottom:5px;font-weight:500}
+.form-group{margin-bottom:16px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:14px;padding:10px 20px;transition:all .15s;text-decoration:none}
+.btn-primary{background:var(--pu);color:#fff}.btn-primary:hover{background:var(--pud);color:#fff}
+.btn-secondary{background:transparent;color:var(--tx);border:1px solid var(--border2)}.btn-secondary:hover{border-color:var(--pu);color:var(--pul)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-danger{background:rgba(255,77,106,.15);color:var(--re);border:1px solid rgba(255,77,106,.2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.badge-pu{background:rgba(124,92,252,.15);color:var(--pul);border:1px solid rgba(124,92,252,.2)}
+.badge-gr{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.badge-re{background:rgba(255,77,106,.1);color:var(--re);border:1px solid rgba(255,77,106,.2)}
+.badge-am{background:rgba(245,158,11,.1);color:var(--am);border:1px solid rgba(245,158,11,.2)}
+.badge-cy{background:rgba(0,201,177,.1);color:var(--cy);border:1px solid rgba(0,201,177,.2)}
+
+/* alerts */
+.alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80}
+.alert-error{background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.2);color:var(--re)}
+.alert-info{background:rgba(0,201,177,.1);border:1px solid rgba(0,201,177,.2);color:var(--cy)}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<nav>
+  <div class="nav-logo">&#127916; <span>AI</span>Tube</div>
+  <div class="nav-links">
+    <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+    <a href="{% url 'youtube_home' %}" class="nav-link {% if 'youtube' in request.resolver_match.url_name %}active{% endif %}">YouTube</a>
+  </div>
+  <span class="nav-user">{{ user.email }}</span>
+  <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm" style="margin-left:8px">Logout</a>
+</nav>
+{% endif %}
+
+{% if messages %}
+<div style="max-width:1100px;margin:12px auto;padding:0 20px">
+  {% for msg in messages %}
+  <div class="alert alert-{% if msg.tags == 'error' %}error{% else %}success{% endif %}">
+    {{ msg }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,41 @@
+services:
+  # 1. Django Main App
+  - type: web
+    name: aitube-main
+    env: docker
+    dockerContext: .
+    dockerfilePath: Dockerfile.django
+    plan: free # Change to starter/standard if needed
+    healthCheckPath: /login/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+
+  # 2. YouTube Analysis Service
+  - type: web
+    name: aitube-youtube
+    env: docker
+    dockerContext: .
+    dockerfilePath: Dockerfile.youtube
+    healthCheckPath: /health
+
+  # 3. Sentiment Service
+  - type: web
+    name: aitube-sentiment
+    env: docker
+    dockerContext: .
+    dockerfilePath: Dockerfile.sentiment
+    healthCheckPath: /health
+
+  # 4. RAG Worker Service
+  - type: web
+    name: aitube-rag
+    env: docker
+    dockerContext: .
+    dockerfilePath: Dockerfile.rag
+    healthCheckPath: /health
+
+databases:
+  - name: aitube-db
+    databaseName: aitube
+    user: aitube_user
