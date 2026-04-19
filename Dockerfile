@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
 
+# Install latest yt-dlp via pip for better compatibility
+RUN pip install --no-cache-dir -U yt-dlp
+
 WORKDIR /app
 
 # Copy all files
