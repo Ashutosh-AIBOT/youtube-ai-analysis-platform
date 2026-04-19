@@ -1,52 +1,40 @@
-# AITube: Agentic AI YouTube Analysis and RAG Platform
+---
+title: YouTube AI Analysis Platform
+emoji: 🎥
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: true
+---
 
-AITube is a sophisticated, microservices-oriented platform designed to provide deep insights into YouTube content. By leveraging state-of-the-art Large Language Models (LLMs) and Vector Databases, AITube transforms passive video watching into an interactive, AI-driven learning experience.
+# 🎥 YouTube AI Analysis Platform
 
-## Technical Architecture Overview
+A powerful, multi-service platform for deep analysis of YouTube content, sentiment tracking, and interactive RAG-based chat.
 
-The system architecture is built on a distributed microservices model to ensure scalability and separation of concerns:
+## 🚀 Deployment (Hugging Face Spaces)
 
-*   **Core Orchestrator (Django)**: Manages the user lifecycle, playlist indexing, and cross-service communication.
-*   **Video Intelligence Service (FastAPI)**: Utilizes `yt-dlp` for high-fidelity metadata extraction and advanced transcript processing.
-*   **Cognitive Analysis Service (FastAPI)**: Performs multi-dimensional analysis including thematic summarization, roadmap generation, and sentiment modeling using Gemini 1.5.
-*   **RAG Engine (FastAPI + ChromaDB)**: Implements a Retrieval-Augmented Generation pipeline to enable context-aware conversations based on video transcripts.
+This project is optimized for Hugging Face Spaces. It uses a **Multi-Service Architecture** running inside a single Docker container managed by `supervisord`.
 
-## Key Capabilities
+### ✨ Key Features
+- **Video Analysis**: Summaries, pros/cons, and roadmap generation.
+- **Sentiment Engine**: Real-time emotion tracking across video segments.
+- **RAG Assistant**: Chat with your YouTube playlists using advanced retrieval.
+- **Modern UI**: Built with Django and premium CSS aesthetics.
 
-### 1. Advanced Content Analysis
-- **Automated Roadmaps**: Generates step-by-step learning paths based on video content.
-- **Key Takeaways**: Extracts actionable insights and structured knowledge points.
-- **Sentiment & Emotion Modeling**: Analyzes audience perception and emotional tone through LLM-assisted scoring.
+## 🛠️ Architecture
+- **Frontend**: Django + Gunicorn (Port 7860)
+- **YouTube Core**: FastAPI + Uvicorn (Port 8005)
+- **Sentiment**: FastAPI + Uvicorn (Port 8010)
+- **RAG Worker**: FastAPI + Uvicorn (Port 8011)
 
-### 2. Contextual RAG Chat
-- **Vectorized Search**: Transcripts are indexed in ChromaDB for semantic retrieval.
-- **Augmented Inference**: Uses Llama-3 (via Groq) to answer complex questions with high precision and low latency.
-
-### 3. Production-Ready Deployment
-- **Docker Integration**: Full containerization for all services ensuring environment parity.
-- **Render Blueprints**: Ready-to-use `render.yaml` for automated cloud deployment.
-- **Scalable Infrastructure**: Designed to integrate with external vector stores like Pinecone and managed PostgreSQL databases.
-
-## Development and Deployment
-
-### Local Environment Setup
-1.  Initialize the environment configuration:
-    ```bash
-    cp .env.example .env
-    ```
-2.  Launch the services using Docker Compose:
-    ```bash
-    docker-compose up --build
-    ```
-
-### Production Deployment
-The platform is optimized for deployment on **Render**. For detailed instructions on secret management and internal networking, refer to the `deployment_guide.md` and `system_design.md` documents.
-
-## Technology Stack
-- **Frameworks**: Django, FastAPI, LangChain
-- **AI/ML**: Groq (Llama-3), Google Gemini 1.5 Flash
-- **Database**: PostgreSQL (Relational), ChromaDB (Vector)
-- **Utilities**: yt-dlp, ffmpeg, Whitenoise
+## 🔑 Environment Variables
+To make the AI work, add these to your Space's **Settings -> Variables and Secrets**:
+- `DJANGO_SECRET_KEY`: Any long random string.
+- `GEMINI_API_KEY`: Your Google Gemini API Key.
+- `GROQ_API_KEY`: Your Groq API Key.
+- `YOUTUBE_API_KEY`: Your YouTube Data API v3 Key.
+- `INTERNAL_API_KEY`: `mypassword123` (used for service communication).
 
 ---
-© 2024 AITube Platform. All rights reserved.
+*Built with ❤️ for the AI community on Hugging Face.*
