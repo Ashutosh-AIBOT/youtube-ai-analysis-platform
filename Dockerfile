@@ -31,4 +31,4 @@ ENV PORT=7860
 EXPOSE 7860
 
 # Run everything via Supervisor
-CMD ["/usr/bin/supervisord", "-c", "/app/supervisord.conf"]
+CMD ["/app/start.sh"]
