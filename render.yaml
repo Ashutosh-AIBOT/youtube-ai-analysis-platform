@@ -3,7 +3,7 @@ services:
   - type: web
     name: aitube-main
     env: docker
-    dockerContext: django_app
+    dockerContext: .
     dockerfilePath: django_app/Dockerfile
     plan: free
     healthCheckPath: /login/
@@ -15,7 +15,7 @@ services:
   - type: web
     name: aitube-youtube
     env: docker
-    dockerContext: youtube_app
+    dockerContext: .
     dockerfilePath: youtube_app/Dockerfile
     healthCheckPath: /health
 
@@ -23,7 +23,7 @@ services:
   - type: web
     name: aitube-sentiment
     env: docker
-    dockerContext: fastapi_services
+    dockerContext: .
     dockerfilePath: fastapi_services/Dockerfile.sentiment
     healthCheckPath: /health
 
@@ -31,7 +31,7 @@ services:
   - type: web
     name: aitube-rag
     env: docker
-    dockerContext: fastapi_services
+    dockerContext: .
     dockerfilePath: fastapi_services/Dockerfile.rag
     healthCheckPath: /health
 
