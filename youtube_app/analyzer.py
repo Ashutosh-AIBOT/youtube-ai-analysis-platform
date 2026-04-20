@@ -3,7 +3,8 @@ from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from config import GROQ_API_KEY, GEMINI_API_KEY, LOCAL_LLM_URL, LOCAL_MODEL
+from urllib.parse import urlparse, parse_qs
+from config import GROQ_API_KEY, GEMINI_API_KEY, YOUTUBE_API_KEY, LOCAL_LLM_URL, LOCAL_MODEL
 
 # ── LLM helper ─────────────────────────────────────────
 def _get_llm():
@@ -117,28 +118,106 @@ def get_transcript(url: str) -> str:
 
 
 def get_playlist_videos(url: str, max_videos: int = 10) -> list:
+    """
+    Returns a list of videos in a playlist.
+
+    Primary: `yt-dlp --flat-playlist` (works without API key, but can be blocked in some hosted envs).
+    Fallback: YouTube Data API v3 `playlistItems` if `YOUTUBE_API_KEY` is set.
+    """
+    yt_videos: list[dict] = []
     try:
         r = subprocess.run(
             ["yt-dlp", "--flat-playlist", "--dump-json",
              "--playlist-end", str(max_videos), url],
             capture_output=True, text=True, timeout=30)
-        videos = []
-        for line in r.stdout.strip().split("\n"):
-            if not line:
+        if r.returncode != 0:
+            err = (r.stderr or "").strip().splitlines()[:6]
+            print(f"[WARNING] yt-dlp playlist failed (rc={r.returncode}): " + " | ".join(err))
+        for line in (r.stdout or "").splitlines():
+            if not line.strip():
                 continue
             try:
                 d = json.loads(line)
-                videos.append({
-                    "title"   : d.get("title", ""),
-                    "id"      : d.get("id", ""),
-                    "url"     : f"https://youtube.com/watch?v={d.get('id','')}",
-                    "duration": d.get("duration", 0),
+                vid = d.get("id", "") or ""
+                if not vid:
+                    continue
+                yt_videos.append({
+                    "title": d.get("title", "") or "",
+                    "id": vid,
+                    "url": f"https://youtube.com/watch?v={vid}",
+                    "duration": d.get("duration", 0) or 0,
                 })
             except Exception:
-                pass
-        return videos
-    except Exception:
+                continue
+    except Exception as e:
+        print(f"[WARNING] yt-dlp playlist exception: {e}")
+
+    if yt_videos:
+        return yt_videos[:max_videos]
+
+    api_key = (YOUTUBE_API_KEY or "").strip()
+    if not api_key:
         return []
+
+    playlist_id = _extract_playlist_id(url)
+    if not playlist_id:
+        print("[WARNING] Could not extract playlist id from URL for API fallback.")
+        return []
+
+    try:
+        return _fetch_playlist_videos_api(playlist_id, api_key, max_videos=max_videos)
+    except Exception as e:
+        print(f"[WARNING] YouTube Data API playlist fallback failed: {e}")
+        return []
+
+
+def _extract_playlist_id(url: str) -> str:
+    try:
+        qs = parse_qs(urlparse(url).query)
+        pl = (qs.get("list") or [""])[0].strip()
+        if pl:
+            return pl
+    except Exception:
+        pass
+    # Some users paste only the id, or URLs like "...?list=...&si=..."
+    m = re.search(r"(?:^|[?&])list=([A-Za-z0-9_-]+)", url)
+    return (m.group(1) if m else "").strip()
+
+
+def _fetch_playlist_videos_api(playlist_id: str, api_key: str, max_videos: int = 10) -> list:
+    videos: list[dict] = []
+    page_token: str | None = None
+
+    with httpx.Client(timeout=20) as c:
+        while len(videos) < max_videos:
+            remaining = max_videos - len(videos)
+            params = {
+                "part": "snippet",
+                "playlistId": playlist_id,
+                "maxResults": min(50, remaining),
+                "key": api_key,
+            }
+            if page_token:
+                params["pageToken"] = page_token
+            r = c.get("https://www.googleapis.com/youtube/v3/playlistItems", params=params)
+            if r.status_code != 200:
+                raise RuntimeError(f"playlistItems status={r.status_code} body={r.text[:200]}")
+            data = r.json()
+            for item in data.get("items", []) or []:
+                sn = item.get("snippet") or {}
+                rid = (sn.get("resourceId") or {}).get("videoId") or ""
+                if not rid:
+                    continue
+                videos.append({
+                    "title": sn.get("title", "") or "",
+                    "id": rid,
+                    "url": f"https://youtube.com/watch?v={rid}",
+                    "duration": 0,
+                })
+            page_token = data.get("nextPageToken")
+            if not page_token:
+                break
+    return videos[:max_videos]
 
 
 # ── emotion detection (keyword-based, no heavy model) ──

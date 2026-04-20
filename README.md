@@ -33,8 +33,12 @@ To make the AI work, add these to your Space's **Settings -> Variables and Secre
 - `DJANGO_SECRET_KEY`: Any long random string.
 - `GEMINI_API_KEY`: Your Google Gemini API Key.
 - `GROQ_API_KEY`: Your Groq API Key.
-- `YOUTUBE_API_KEY`: Your YouTube Data API v3 Key.
+- `YOUTUBE_API_KEY`: Your YouTube Data API v3 Key (recommended; used as playlist fallback on hosted deploys).
 - `INTERNAL_API_KEY`: `mypassword123` (used for service communication).
+
+### Notes for Hugging Face Spaces
+- Playlist fetching can return `0` videos on Spaces if YouTube blocks `yt-dlp` requests; setting `YOUTUBE_API_KEY` enables a more reliable YouTube Data API fallback.
+- All services run in one container (via `supervisord`) and talk to each other over `localhost` ports.
 
 ---
 *Built with ❤️ for the AI community on Hugging Face.*

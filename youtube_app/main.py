@@ -1,4 +1,5 @@
 import time
+import asyncio
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.security import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
@@ -71,7 +72,8 @@ async def get_job(job_id: str, _=Depends(verify)):
 @app.post("/playlist")
 async def playlist(req: PlaylistReq, _=Depends(verify)):
     """Get all video URLs from a YouTube playlist"""
-    videos = get_playlist_videos(req.url, req.max_videos)
+    # get_playlist_videos runs yt-dlp and/or makes network calls; keep event loop responsive
+    videos = await asyncio.to_thread(get_playlist_videos, req.url, req.max_videos)
     return {"videos": videos, "count": len(videos)}
 
 
