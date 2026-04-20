@@ -7,11 +7,15 @@ sleep 2
 
 # Path to conda
 CONDA_PATH=~/miniconda3/etc/profile.d/conda.sh
+CONDA_ENV=fullstack_env
+DJANGO_PORT="${DJANGO_PORT:-7860}"
 
 # Start YouTube Service (port 8005)
 echo "1. Starting YouTube Service (port 8005)..."
 source $CONDA_PATH
-conda activate fullstack_env
+conda activate "$CONDA_ENV"
+# Ensure conda's runtime libs are preferred (fixes CXXABI/libstdc++ mismatch on some systems)
+export LD_LIBRARY_PATH="$CONDA_PREFIX/lib"
 cd youtube_app
 uvicorn main:app --port 8005 --host 0.0.0.0 &
 YOUTUBE_PID=$!
@@ -38,14 +42,14 @@ cd ../..
 sleep 3
 
 # Start Django (port 8000)
-echo "4. Starting Django (port 8000)..."
+echo "4. Starting Django (port ${DJANGO_PORT})..."
 cd django_app
-python manage.py runserver 8000 &
+python manage.py runserver "${DJANGO_PORT}" &
 DJANGO_PID=$!
 cd ..
 
 echo "Services started. PIDs: $YOUTUBE_PID, $SENTIMENT_PID, $RAG_PID, $DJANGO_PID"
-echo "Access Django at http://localhost:8000"
+echo "Access Django at http://localhost:${DJANGO_PORT}"
 
 # Keep script running to monitor or wait
 wait

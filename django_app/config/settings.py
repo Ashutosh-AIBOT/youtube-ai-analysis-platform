@@ -2,9 +2,11 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 BASE_DIR   = Path(__file__).resolve().parent.parent
+ROOT_DIR   = BASE_DIR.parent
+
+# Prefer repo-root `.env` (works even when running from `django_app/`)
+load_dotenv(dotenv_path=ROOT_DIR / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", os.getenv("SECRET_KEY", "change-me"))
 DEBUG      = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", os.getenv("ALLOWED_HOSTS", "*")).split(",")
